@@ -1,55 +1,57 @@
-import { Component } from "react";
+import { useState } from "react";
 import { Form, Label, Input, Button } from "./ContactForm.styled";
 
-class ContactForm extends Component {
-  state = {
-    name: "",
-    number: "",
+function ContactForm({ onSubmit }) {
+  const [name, setName] = useState("");
+  const [number, setNumber] = useState("");
+
+  const handleChange = (e) => {
+    switch (e.target.name) {
+      case "name":
+        setName(e.target.value);
+        break;
+      case "number":
+        setNumber(e.target.value);
+        break;
+      default:
+        return;
+    }
   };
 
-  handleChange = (e) => {
-    this.setState({ [e.currentTarget.name]: e.target.value });
-  };
-
-  handleSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const { name, number } = this.state;
-    const { onSubmit } = this.props;
 
     onSubmit(name, number);
-    this.setState({ name: "", number: "" });
+    setName("");
+    setNumber("");
   };
 
-  render() {
-    const { handleSubmit, handleChange } = this;
-    const { name, number } = this.state;
-    return (
-      <Form action="" onSubmit={handleSubmit}>
-        <Label htmlFor="name">Name</Label>
-        <Input
-          onChange={handleChange}
-          type="text"
-          name="name"
-          value={name}
-          pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-          title="Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п."
-          required
-        />
-        <Label htmlFor="number">Number</Label>
-        <Input
-          onChange={handleChange}
-          type="tel"
-          name="number"
-          value={number}
-          pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-          title="Номер телефона должен состоять цифр и может содержать пробелы, тире, круглые скобки и может начинаться с +"
-          required
-        />
+  return (
+    <Form action="" onSubmit={handleSubmit}>
+      <Label htmlFor="name">Name</Label>
+      <Input
+        onChange={handleChange}
+        type="text"
+        name="name"
+        value={name}
+        pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+        title="Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п."
+        required
+      />
+      <Label htmlFor="number">Number</Label>
+      <Input
+        onChange={handleChange}
+        type="tel"
+        name="number"
+        value={number}
+        pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
+        title="Номер телефона должен состоять цифр и может содержать пробелы, тире, круглые скобки и может начинаться с +"
+        required
+      />
 
-        <Button type="submit">Add contact</Button>
-      </Form>
-    );
-  }
+      <Button type="submit">Add contact</Button>
+    </Form>
+  );
 }
 
 export default ContactForm;

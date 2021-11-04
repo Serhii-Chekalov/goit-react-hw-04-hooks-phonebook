@@ -1,86 +1,85 @@
-import { Component } from "react";
+import { useState, useEffect } from "react";
 import ContactForm from "../ContactForm/ContactForm";
 import ContactList from "../ContactsList/ContactList";
 import Filter from "../Filter/Filter";
 import { PrimaryTitle, SecondaryTitle } from "./App.styled";
 import { v4 as uuidv4 } from "uuid";
+import toast, { Toaster } from "react-hot-toast";
 
-class App extends Component {
-  state = {
-    contacts: [
-      { id: "id-1", name: "Rosie Simpson", number: "459-12-56" },
-      { id: "id-2", name: "Hermione Kline", number: "443-89-12" },
-      { id: "id-3", name: "Eden Clements", number: "645-17-79" },
-      { id: "id-4", name: "Annie Copeland", number: "227-91-26" },
-    ],
-    filter: "",
-  };
+function App() {
+  const [contacts, setContacts] = useState([
+    { id: "id-1", name: "Rosie Simpson", number: "459-12-56" },
+    { id: "id-2", name: "Hermione Kline", number: "443-89-12" },
+    { id: "id-3", name: "Eden Clements", number: "645-17-79" },
+    { id: "id-4", name: "Annie Copeland", number: "227-91-26" },
+  ]);
 
-  componentDidMount() {
+  const [filter, setFilter] = useState("");
+
+  useEffect(() => {
     const storageContacts = localStorage.getItem("contacts");
     const storageContactsParced = JSON.parse(storageContacts);
+
     if (storageContactsParced) {
-      this.setState({ contacts: storageContactsParced });
+      setContacts([...storageContactsParced]);
     }
-  }
+  }, []);
 
-  componentDidUpdate(prevState) {
-    if (prevState.contact !== this.state.contacts) {
-      localStorage.setItem("contacts", JSON.stringify(this.state.contacts));
-    }
-  }
+  useEffect(() => {
+    localStorage.setItem("contacts", JSON.stringify(contacts));
+  }, [contacts]);
 
-  handleFilter = (text) => {
-    this.setState({ filter: text });
-  };
+  const notify = (name) => toast(`${name} is already in contacts`);
 
-  visibleContacts = () => {
-    const { filter, contacts } = this.state;
-
-    const normalizedFilter = filter.toLowerCase();
-    return contacts.filter((contact) =>
-      contact.name.toLowerCase().includes(normalizedFilter)
-    );
-  };
-
-  addContact = (name, number) => {
-    const { contacts } = this.state;
+  const addContact = (name, number) => {
     const newContact = {
       id: uuidv4(),
       name,
       number,
     };
 
-    contacts.some(
-      (contact) => contact.name.toLowerCase() === newContact.name.toLowerCase()
-    )
-      ? alert(`${newContact.name} is already in contacts`)
-      : this.setState({
-          contacts: [newContact, ...contacts],
-        });
+    contacts.some((contact) => contact.name === newContact.name)
+      ? notify(newContact.name)
+      : setContacts([...contacts, newContact]);
   };
 
-  deleteContact = (id) => {
-    const { contacts } = this.state;
-    this.setState({
-      contacts: contacts.filter((contact) => contact.id !== id),
-    });
+  const deleteContact = (id) => {
+    return setContacts(contacts.filter((contact) => contact.id !== id));
   };
 
-  render() {
-    const { addContact, handleFilter, visibleContacts, state, deleteContact } =
-      this;
-    return (
-      <>
-        <PrimaryTitle>Phonebook</PrimaryTitle>
-        <ContactForm onSubmit={addContact} />
+  const handleFilter = (text) => {
+    setFilter(text);
+  };
 
-        <SecondaryTitle>Contacts</SecondaryTitle>
-        <Filter onChange={handleFilter} value={state.filter} />
-        <ContactList contacts={visibleContacts()} deleteId={deleteContact} />
-      </>
-    );
-  }
+  const visibleContacts = () => {
+    const normalizedFilter = filter.toLowerCase();
+
+    if (contacts !== []) {
+      return contacts.filter((contact) =>
+        contact.name.toLowerCase().includes(normalizedFilter)
+      );
+    }
+  };
+
+  return (
+    <>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "red",
+            color: "#000",
+          },
+        }}
+      />
+      <PrimaryTitle>Phonebook</PrimaryTitle>
+      <ContactForm onSubmit={addContact} />
+      <SecondaryTitle>Contacts</SecondaryTitle>
+      <Filter onChange={handleFilter} value={filter} />
+      <ContactList contacts={visibleContacts()} deleteId={deleteContact} />
+    </>
+  );
 }
 
 export default App;
