@@ -52,13 +52,9 @@ function App() {
   };
 
   const visibleContacts = () => {
-    const normalizedFilter = filter.toLowerCase();
-
-    if (contacts !== []) {
-      return contacts.filter((contact) =>
-        contact.name.toLowerCase().includes(normalizedFilter)
-      );
-    }
+    return contacts.filter((contact) =>
+      contact.name.toLowerCase().includes(filter.toLowerCase())
+    );
   };
 
   return (
