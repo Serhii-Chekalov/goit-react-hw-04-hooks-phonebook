@@ -47,8 +47,8 @@ function App() {
     return setContacts(contacts.filter((contact) => contact.id !== id));
   };
 
-  const handleFilter = (text) => {
-    setFilter(text);
+  const handleFilter = (e) => {
+    setFilter(e.target.value);
   };
 
   const visibleContacts = () => {
